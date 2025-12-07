@@ -80,11 +80,11 @@ function parseWithRules(transcript) {
   
   // Extract priority
   let priority = 'medium';
-  if (/\b(urgent|critical|asap|immediately)\b/i.test(transcript)) {
+  if (/\b(urgent|urgently|critical|critically|asap|immediately|right away|right now)\b/i.test(transcript)) {
     priority = 'urgent';
-  } else if (/\b(high priority|important|high)\b/i.test(transcript)) {
+  } else if (/\b(high priority|important|high|priority high)\b/i.test(transcript)) {
     priority = 'high';
-  } else if (/\b(low priority|not urgent|whenever|low)\b/i.test(transcript)) {
+  } else if (/\b(low priority|not urgent|whenever|low|no rush|no hurry)\b/i.test(transcript)) {
     priority = 'low';
   }
 
@@ -112,7 +112,7 @@ function parseWithRules(transcript) {
     // Remove common prefixes
     .replace(/^(create a |add a |make a |remind me to |i need to |i want to |please |can you )/i, '')
     // Remove priority phrases
-    .replace(/\b(urgent|critical|high priority|low priority|important|it's |its )\b/gi, '')
+    .replace(/\b(urgent|urgently|critical|critically|asap|immediately|right away|right now|high priority|low priority|important|no rush|no hurry|it's |its )\b/gi, '')
     // Remove date phrases (simplified)
     .replace(/\b(by |before |until |due |on |at |tomorrow|today|next week|next monday|next tuesday|next wednesday|next thursday|next friday|next saturday|next sunday|this week|in \d+ days?|in \d+ hours?)\b.*/gi, '')
     // Remove status phrases
