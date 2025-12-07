@@ -8,7 +8,7 @@ if (process.env.OPENAI_API_KEY) {
     apiKey: process.env.OPENAI_API_KEY
   });
 }
-
+ 
 /**
  * Parse voice transcript using AI (OpenAI GPT) or fallback to rule-based parsing
  * @param {string} transcript - The voice transcript to parse

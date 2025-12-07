@@ -16,6 +16,7 @@ function VoiceModal({ onClose, onComplete }) {
   const [error, setError] = useState('');
   
   const recognitionRef = useRef(null);
+  const finalTranscriptRef = useRef('');
 
   useEffect(() => {
     // Check for browser support
@@ -32,22 +33,20 @@ function VoiceModal({ onClose, onComplete }) {
     recognition.lang = 'en-US';
 
     recognition.onresult = (event) => {
-      let finalTranscript = '';
       let interimTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
+        const text = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
+          finalTranscriptRef.current += text + ' ';
         } else {
-          interimTranscript += transcript;
+          interimTranscript = text;
         }
       }
 
-      setTranscript((prev) => {
-        const newTranscript = (prev + finalTranscript).trim();
-        return newTranscript || interimTranscript;
-      });
+      // Show final transcript + current interim
+      const displayText = (finalTranscriptRef.current + interimTranscript).trim();
+      setTranscript(displayText);
     };
 
     recognition.onerror = (event) => {
@@ -90,10 +89,12 @@ function VoiceModal({ onClose, onComplete }) {
         handleParse();
       }
     } else {
+      // Reset everything for new recording
       setTranscript('');
       setParsedData(null);
       setEditedData(null);
       setError('');
+      finalTranscriptRef.current = ''; // Reset the accumulated transcript
       setIsRecording(true);
       recognitionRef.current.start();
     }
@@ -328,4 +329,4 @@ function VoiceModal({ onClose, onComplete }) {
 }
 
 export default VoiceModal;
-
+ 
