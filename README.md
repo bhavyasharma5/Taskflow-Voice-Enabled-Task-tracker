@@ -362,40 +362,48 @@ All endpoints return errors in this format:
 ## 🤖 AI Tools Usage
 
 ### Tools Used
-- **Cursor IDE with Claude** - Primary development assistant
-- **GitHub Copilot** - Code suggestions and autocomplete
+- **GitHub Copilot** - Code autocompletion and suggestions
+- **ChatGPT** - Reference for library documentation and debugging help
 
 ### What AI Helped With
-1. **Boilerplate Code**
-   - Express server setup
-   - React component structure
-   - API endpoint scaffolding
 
-2. **Voice Parsing Logic**
-   - OpenAI prompt engineering
-   - chrono-node integration
-   - Edge case handling
+1. **Documentation & Research**
+   - Understanding Web Speech API browser compatibility
+   - Learning @dnd-kit library patterns
+   - chrono-node usage examples for date parsing
 
-3. **UI/UX Design**
-   - CSS styling suggestions
-   - Animation patterns
-   - Accessibility improvements
+2. **Boilerplate & Repetitive Code**
+   - Initial Express server setup
+   - Basic CRUD endpoint structure
+   - CSS variable definitions for theming
 
-4. **Debugging**
-   - Error handling patterns
-   - CORS configuration
-   - State management issues
+3. **Debugging Assistance**
+   - Troubleshooting CORS configuration
+   - Fixing drag-and-drop edge cases
+   - Resolving React state update issues
 
-### Notable Prompts
-1. "Create a voice parsing service that extracts task details from natural language input, handling relative dates and priority keywords"
-2. "Design a drag-and-drop Kanban board using @dnd-kit with optimistic updates"
-3. "Style a modern task tracker with a dark theme inspired by Linear"
+### What I Built Myself
+
+1. **Core Application Logic**
+   - Voice parsing algorithm with priority/date extraction
+   - Task state management and data flow
+   - Kanban board drag-and-drop implementation
+
+2. **UI/UX Design**
+   - Dark theme color palette inspired by Linear
+   - Component architecture and layout decisions
+   - User flow for voice input → preview → save
+
+3. **API Design**
+   - RESTful endpoint structure
+   - Input validation and error handling
+   - Optimistic updates for better UX
 
 ### What I Learned
-- Web Speech API is surprisingly powerful and works well for English
-- OpenAI prompts need careful structuring for consistent JSON output
-- chrono-node handles most natural date expressions out of the box
-- Optimistic updates significantly improve perceived performance
+- Web Speech API is surprisingly powerful but has browser limitations
+- Designing good OpenAI prompts requires iteration for consistent JSON output
+- chrono-node handles most natural language date expressions out of the box
+- Optimistic updates significantly improve perceived performance in drag-and-drop
 
 ## 🚧 Known Limitations
 
