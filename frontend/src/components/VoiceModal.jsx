@@ -19,7 +19,6 @@ function VoiceModal({ onClose, onComplete }) {
   const finalTranscriptRef = useRef('');
 
   useEffect(() => {
-    // Check for browser support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
@@ -44,7 +43,6 @@ function VoiceModal({ onClose, onComplete }) {
         }
       }
 
-      // Show final transcript + current interim
       const displayText = (finalTranscriptRef.current + interimTranscript).trim();
       setTranscript(displayText);
     };
@@ -53,9 +51,7 @@ function VoiceModal({ onClose, onComplete }) {
       console.error('Speech recognition error:', event.error);
       if (event.error === 'not-allowed') {
         setError('Microphone access denied. Please allow microphone access and try again.');
-      } else if (event.error === 'no-speech') {
-        // Ignore no-speech errors during continuous recording
-      } else {
+      } else if (event.error !== 'no-speech') {
         setError(`Speech recognition error: ${event.error}`);
       }
       setIsRecording(false);
@@ -63,7 +59,6 @@ function VoiceModal({ onClose, onComplete }) {
 
     recognition.onend = () => {
       if (isRecording) {
-        // Restart if still supposed to be recording
         recognition.start();
       }
     };
@@ -84,17 +79,15 @@ function VoiceModal({ onClose, onComplete }) {
       recognitionRef.current.stop();
       setIsRecording(false);
       
-      // Auto-parse after stopping if we have transcript
       if (transcript.trim()) {
         handleParse();
       }
     } else {
-      // Reset everything for new recording
       setTranscript('');
       setParsedData(null);
       setEditedData(null);
       setError('');
-      finalTranscriptRef.current = ''; // Reset the accumulated transcript
+      finalTranscriptRef.current = '';
       setIsRecording(true);
       recognitionRef.current.start();
     }
@@ -113,8 +106,8 @@ function VoiceModal({ onClose, onComplete }) {
       const result = await parseTranscript(transcript);
       setParsedData(result.parsed);
       setEditedData(result.parsed);
-    } catch (error) {
-      console.error('Parse error:', error);
+    } catch (err) {
+      console.error('Parse error:', err);
       setError('Failed to parse transcript. Please try again.');
       toast.error('Failed to parse transcript');
     } finally {
@@ -137,25 +130,14 @@ function VoiceModal({ onClose, onComplete }) {
   const formatDueDate = (dateString) => {
     if (!dateString) return '';
     try {
-      const date = new Date(dateString);
-      return format(date, "yyyy-MM-dd'T'HH:mm");
+      return format(new Date(dateString), "yyyy-MM-dd'T'HH:mm");
     } catch {
       return '';
     }
   };
 
-  const priorityLabels = {
-    low: 'Low',
-    medium: 'Medium',
-    high: 'High',
-    urgent: 'Urgent'
-  };
-
-  const statusLabels = {
-    todo: 'To Do',
-    in_progress: 'In Progress',
-    done: 'Done'
-  };
+  const priorityLabels = { low: 'Low', medium: 'Medium', high: 'High', urgent: 'Urgent' };
+  const statusLabels = { todo: 'To Do', in_progress: 'In Progress', done: 'Done' };
 
   return (
     <AnimatePresence>
@@ -182,7 +164,6 @@ function VoiceModal({ onClose, onComplete }) {
           </div>
 
           <div className="modal-body">
-            {/* Voice Input Section */}
             <div className="voice-input-section">
               <button
                 className={`voice-button ${isRecording ? 'recording' : ''}`}
@@ -213,13 +194,10 @@ function VoiceModal({ onClose, onComplete }) {
               )}
             </div>
 
-            {/* Transcript Display */}
             {transcript && (
               <div className="transcript-section">
                 <p className="transcript-label">Transcript</p>
-                <div className="transcript-text">
-                  "{transcript}"
-                </div>
+                <div className="transcript-text">"{transcript}"</div>
 
                 {!parsedData && !isParsing && (
                   <button
@@ -243,7 +221,6 @@ function VoiceModal({ onClose, onComplete }) {
               </div>
             )}
 
-            {/* Parsed Preview - Editable */}
             {editedData && (
               <div className="parsed-preview">
                 <div className="parsed-preview-header">
@@ -329,4 +306,3 @@ function VoiceModal({ onClose, onComplete }) {
 }
 
 export default VoiceModal;
- 

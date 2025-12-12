@@ -1,34 +1,23 @@
 const OpenAI = require('openai');
 const chrono = require('chrono-node');
 
-// Initialize OpenAI client (optional - will use fallback if not configured)
 let openai = null;
 if (process.env.OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  });
+  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
- 
-/**
- * Parse voice transcript using AI (OpenAI GPT) or fallback to rule-based parsing
- * @param {string} transcript - The voice transcript to parse
- * @returns {Promise<Object>} - Parsed task fields
- */
+
 async function parseVoiceTranscript(transcript) {
   if (openai) {
     try {
       return await parseWithAI(transcript);
     } catch (error) {
-      console.error('AI parsing failed, falling back to rule-based:', error.message);
+      console.error('AI parsing failed, using fallback:', error.message);
       return parseWithRules(transcript);
     }
   }
   return parseWithRules(transcript);
 }
 
-/**
- * Parse transcript using OpenAI GPT
- */
 async function parseWithAI(transcript) {
   const today = new Date();
   const prompt = `You are a task parsing assistant. Extract task details from the following voice transcript and return a JSON object.
@@ -62,7 +51,6 @@ Return ONLY a valid JSON object with these exact fields, no explanation:
 
   const content = response.choices[0].message.content.trim();
   
-  // Extract JSON from response (handle markdown code blocks)
   let jsonStr = content;
   if (content.includes('```')) {
     const match = content.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -72,13 +60,7 @@ Return ONLY a valid JSON object with these exact fields, no explanation:
   return JSON.parse(jsonStr);
 }
 
-/**
- * Fallback: Parse transcript using rule-based approach with chrono-node
- */
 function parseWithRules(transcript) {
-  const lowerTranscript = transcript.toLowerCase();
-  
-  // Extract priority
   let priority = 'medium';
   if (/\b(urgent|urgently|critical|critically|asap|immediately|right away|right now)\b/i.test(transcript)) {
     priority = 'urgent';
@@ -88,7 +70,6 @@ function parseWithRules(transcript) {
     priority = 'low';
   }
 
-  // Extract status
   let status = 'todo';
   if (/\b(in progress|working on|started)\b/i.test(transcript)) {
     status = 'in_progress';
@@ -96,33 +77,24 @@ function parseWithRules(transcript) {
     status = 'done';
   }
 
-  // Extract due date using chrono-node
   let dueDate = null;
   const parsedDate = chrono.parseDate(transcript);
   if (parsedDate) {
-    // If no time specified, default to end of day (6 PM)
     if (parsedDate.getHours() === 12 && parsedDate.getMinutes() === 0) {
       parsedDate.setHours(18, 0, 0, 0);
     }
     dueDate = parsedDate.toISOString();
   }
 
-  // Extract title - remove date/priority phrases
   let title = transcript
-    // Remove common prefixes
     .replace(/^(create a |add a |make a |remind me to |i need to |i want to |please |can you )/i, '')
-    // Remove priority phrases
     .replace(/\b(urgent|urgently|critical|critically|asap|immediately|right away|right now|high priority|low priority|important|no rush|no hurry|it's |its )\b/gi, '')
-    // Remove date phrases (simplified)
     .replace(/\b(by |before |until |due |on |at |tomorrow|today|next week|next monday|next tuesday|next wednesday|next thursday|next friday|next saturday|next sunday|this week|in \d+ days?|in \d+ hours?)\b.*/gi, '')
-    // Remove status phrases
     .replace(/\b(status is |mark as |set to )(todo|to do|in progress|done|completed)\b/gi, '')
-    // Clean up
     .replace(/[,.]$/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 
-  // Capitalize first letter
   title = title.charAt(0).toUpperCase() + title.slice(1);
 
   return {
@@ -135,4 +107,3 @@ function parseWithRules(transcript) {
 }
 
 module.exports = { parseVoiceTranscript };
-

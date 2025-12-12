@@ -4,7 +4,6 @@ const { v4: uuidv4 } = require('uuid');
 const { db } = require('../database');
 const { parseVoiceTranscript } = require('../services/voiceParser');
 
-// Validation helpers
 const VALID_STATUSES = ['todo', 'in_progress', 'done'];
 const VALID_PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 
@@ -30,11 +29,6 @@ function validateTask(task, isUpdate = false) {
   return errors;
 }
 
-/**
- * GET /api/tasks
- * Get all tasks with optional filters
- * Query params: status, priority, search, sortBy, sortOrder
- */
 router.get('/', (req, res) => {
   try {
     const { status, priority, search, sortBy = 'createdAt', sortOrder = 'desc', dueDateFrom, dueDateTo } = req.query;
@@ -65,10 +59,6 @@ router.get('/', (req, res) => {
   }
 });
 
-/**
- * GET /api/tasks/:id
- * Get a single task by ID
- */
 router.get('/:id', (req, res) => {
   try {
     const { id } = req.params;
@@ -95,15 +85,10 @@ router.get('/:id', (req, res) => {
   }
 });
 
-/**
- * POST /api/tasks
- * Create a new task
- */
 router.post('/', (req, res) => {
   try {
     const { title, description = '', status = 'todo', priority = 'medium', dueDate = null } = req.body;
 
-    // Validate input
     const errors = validateTask(req.body);
     if (errors.length > 0) {
       return res.status(400).json({
@@ -142,16 +127,11 @@ router.post('/', (req, res) => {
   }
 });
 
-/**
- * PUT /api/tasks/:id
- * Update an existing task
- */
 router.put('/:id', (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, status, priority, dueDate } = req.body;
 
-    // Check if task exists
     const existingTask = db.getTaskById(id);
     if (!existingTask) {
       return res.status(404).json({
@@ -160,7 +140,6 @@ router.put('/:id', (req, res) => {
       });
     }
 
-    // Validate input
     const errors = validateTask(req.body, true);
     if (errors.length > 0) {
       return res.status(400).json({
@@ -171,9 +150,7 @@ router.put('/:id', (req, res) => {
     }
 
     const now = new Date().toISOString();
-    const updates = {
-      updatedAt: now
-    };
+    const updates = { updatedAt: now };
 
     if (title !== undefined) updates.title = title.trim();
     if (description !== undefined) updates.description = description.trim();
@@ -198,15 +175,10 @@ router.put('/:id', (req, res) => {
   }
 });
 
-/**
- * DELETE /api/tasks/:id
- * Delete a task
- */
 router.delete('/:id', (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if task exists
     const existingTask = db.getTaskById(id);
     if (!existingTask) {
       return res.status(404).json({
@@ -232,10 +204,6 @@ router.delete('/:id', (req, res) => {
   }
 });
 
-/**
- * POST /api/tasks/parse
- * Parse voice transcript to extract task fields
- */
 router.post('/parse', async (req, res) => {
   try {
     const { transcript } = req.body;
@@ -266,10 +234,6 @@ router.post('/parse', async (req, res) => {
   }
 });
 
-/**
- * PATCH /api/tasks/:id/status
- * Update only the status of a task (for drag-and-drop)
- */
 router.patch('/:id/status', (req, res) => {
   try {
     const { id } = req.params;

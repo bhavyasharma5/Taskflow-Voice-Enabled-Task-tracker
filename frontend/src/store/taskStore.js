@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { api } from '../services/api';
 
 const useTaskStore = create((set, get) => ({
-  // State
   tasks: [],
   loading: false,
   error: null,
@@ -11,9 +10,8 @@ const useTaskStore = create((set, get) => ({
     priority: '',
     search: ''
   },
-  view: 'kanban', // 'kanban' or 'list'
+  view: 'kanban',
 
-  // Actions
   setView: (view) => set({ view }),
   
   setFilters: (filters) => set((state) => ({
@@ -24,7 +22,6 @@ const useTaskStore = create((set, get) => ({
     filters: { status: '', priority: '', search: '' }
   }),
 
-  // Fetch all tasks
   fetchTasks: async () => {
     set({ loading: true, error: null });
     try {
@@ -37,7 +34,6 @@ const useTaskStore = create((set, get) => ({
     }
   },
 
-  // Create a new task
   createTask: async (taskData) => {
     set({ loading: true, error: null });
     try {
@@ -53,7 +49,6 @@ const useTaskStore = create((set, get) => ({
     }
   },
 
-  // Update a task
   updateTask: async (id, taskData) => {
     set({ error: null });
     try {
@@ -70,9 +65,7 @@ const useTaskStore = create((set, get) => ({
     }
   },
 
-  // Update task status (for drag and drop)
   updateTaskStatus: async (id, status) => {
-    // Optimistic update
     set((state) => ({
       tasks: state.tasks.map((task) =>
         task.id === id ? { ...task, status } : task
@@ -82,13 +75,11 @@ const useTaskStore = create((set, get) => ({
     try {
       await api.updateTaskStatus(id, status);
     } catch (error) {
-      // Revert on error
       get().fetchTasks();
       throw error;
     }
   },
 
-  // Delete a task
   deleteTask: async (id) => {
     set({ error: null });
     try {
@@ -102,17 +93,11 @@ const useTaskStore = create((set, get) => ({
     }
   },
 
-  // Parse voice transcript
   parseTranscript: async (transcript) => {
-    try {
-      const response = await api.parseTranscript(transcript);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.parseTranscript(transcript);
+    return response.data;
   },
 
-  // Get tasks by status (for kanban view)
   getTasksByStatus: (status) => {
     const { tasks, filters } = get();
     let filtered = tasks.filter((task) => task.status === status);
@@ -133,7 +118,6 @@ const useTaskStore = create((set, get) => ({
     return filtered;
   },
 
-  // Get filtered tasks (for list view)
   getFilteredTasks: () => {
     const { tasks, filters } = get();
     let filtered = [...tasks];
@@ -160,4 +144,3 @@ const useTaskStore = create((set, get) => ({
 }));
 
 export default useTaskStore;
-
